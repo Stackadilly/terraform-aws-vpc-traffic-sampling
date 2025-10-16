@@ -17,9 +17,9 @@ This module is intended to be turned on for e.g. 24 hours at a time to sample tr
 
 ```hcl
 module "vpc_traffic_sampling" {
-  source  = "stackadilly/vpc-traffic-sampling/aws"
-  version = "1.0.0"
+  source                  = "Stackadilly/vpc-traffic-sampling/aws"
+  version                 = "1.0.1"
   enable_traffic_sampling = true
-  vpc_ids = ["vpc-12345678"]
+  vpc_ids                 = ["vpc-12345678"]
 }
 ```
