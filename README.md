@@ -1,4 +1,4 @@
-# VPC Flow Logs Module
+# VPC Traffic Sampling Module
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This module is intended to be turned on for e.g. 24 hours at a time to sample tr
 ### Basic Example
 
 ```hcl
-module "vpc_traffic-sampling" {
+module "vpc_traffic_sampling" {
   source  = "stackadilly/vpc-traffic-sampling/aws"
   version = "1.0.0"
   enable_traffic_sampling = true
