@@ -96,7 +96,7 @@ resource "aws_s3_bucket_policy" "logs" {
 
 # -----------------------------
 # VPC Flow Logs -> S3 (Parquet + hive prefixes + hourly)
-# Flow logs are stored under /AWSLogs/{account-id}/{region}/vpcflowlogs/
+# Flow logs are stored under /AWSLogs/aws-account-id={account-id}/aws-service=vpcflowlogs/aws-region={region}/
 # -----------------------------
 resource "aws_flow_log" "vpc" {
   for_each                 = var.enable_traffic_sampling ? toset(var.vpc_ids) : toset([])
@@ -120,7 +120,7 @@ resource "aws_flow_log" "vpc" {
 
 # -----------------------------
 # Route 53 Resolver DNS query logging -> S3
-# Resolver logs are stored under /AWSLogs/{account-id}/{region}/resolver/
+# Resolver logs are stored under /AWSLogs/{account-id}/{region}/vpcdnsquerylogs/{vpc-id}/
 # -----------------------------
 resource "aws_route53_resolver_query_log_config" "dns" {
   count           = var.enable_traffic_sampling ? 1 : 0
@@ -138,7 +138,6 @@ resource "aws_route53_resolver_query_log_config_association" "dns_assoc" {
 # -----------------------------
 # IAM: attach an S3 read policy (scoped to this bucket) to an existing role
 # -----------------------------
-
 resource "aws_iam_policy" "bucket_read" {
   name = "${var.name_prefix}-traffic-analysis-read"
   path = "/"
