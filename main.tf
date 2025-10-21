@@ -13,9 +13,10 @@ data "aws_partition" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  bucket_name    = "${var.name_prefix}-vpc-traffic-sampling-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
-  bucket_arn     = "arn:${data.aws_partition.current.partition}:s3:::${local.bucket_name}"
-  log_prefix_arn = "${local.bucket_arn}/AWSLogs/*"
+  bucket_name        = "${var.name_prefix}-vpc-traffic-sampling-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  bucket_arn         = "arn:${data.aws_partition.current.partition}:s3:::${local.bucket_name}"
+  log_prefix_arn     = "${local.bucket_arn}/AWSLogs/*"
+  flow_log_format    = join(" ", var.flow_log_format)
 }
 
 resource "aws_s3_bucket" "logs" {
@@ -99,12 +100,12 @@ resource "aws_s3_bucket_policy" "logs" {
 # Flow logs are stored under /AWSLogs/aws-account-id={account-id}/aws-service=vpcflowlogs/aws-region={region}/
 # -----------------------------
 resource "aws_flow_log" "vpc" {
-  for_each                 = var.enable_traffic_sampling ? toset(var.vpc_ids) : toset([])
+  for_each                 = var.enable_flow_sampling ? toset(var.vpc_ids) : toset([])
   log_destination_type     = "s3"
   log_destination          = aws_s3_bucket.logs.arn
   traffic_type             = "ALL"
   vpc_id                   = each.value
-  log_format               = var.flow_log_format
+  log_format               = local.flow_log_format
   max_aggregation_interval = 600
 
   destination_options {
@@ -123,14 +124,14 @@ resource "aws_flow_log" "vpc" {
 # Resolver logs are stored under /AWSLogs/{account-id}/{region}/vpcdnsquerylogs/{vpc-id}/
 # -----------------------------
 resource "aws_route53_resolver_query_log_config" "dns" {
-  count           = var.enable_traffic_sampling ? 1 : 0
+  count           = var.enable_dns_sampling ? 1 : 0
   name            = "${var.name_prefix}-dns-query-logs"
   destination_arn = aws_s3_bucket.logs.arn
   tags            = var.tags
 }
 
 resource "aws_route53_resolver_query_log_config_association" "dns_assoc" {
-  for_each                     = var.enable_traffic_sampling ? toset(var.vpc_ids) : toset([])
+  for_each                     = var.enable_dns_sampling ? toset(var.vpc_ids) : toset([])
   resolver_query_log_config_id = aws_route53_resolver_query_log_config.dns[0].id
   resource_id                  = each.value
 }
