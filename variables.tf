@@ -1,10 +1,15 @@
-variable "enable_traffic_sampling" {
-  description = "Master switch for both VPC Flow Logs and DNS Resolver query logging. If false, logging is disabled."
+variable "enable_dns_sampling" {
+  description = "Enable Route 53 Resolver query logging. Turn this on first."
+  type        = bool
+}
+
+variable "enable_flow_sampling" {
+  description = "Enable VPC Flow Logs. Can be turned on along with dns logging, but to mimimize costs, turn this on after DNS sampling has run for at least a day."
   type        = bool
 }
 
 variable "vpc_ids" {
-  description = "List of VPC IDs to collect Flow Logs from (and to associate DNS query logging with)"
+  description = "List of VPC IDs to collect Flow Logs from and to associate DNS query logging with"
   type        = list(string)
 }
 
@@ -15,9 +20,29 @@ variable "s3_retention_days" {
 }
 
 variable "flow_log_format" {
-  description = "Lean custom VPC Flow Log record format"
-  type        = string
-  default     = "$${account-id} $${vpc-id} $${instance-id} $${interface-id} $${srcaddr} $${dstaddr} $${pkt-srcaddr} $${pkt-dstaddr} $${dstport} $${action} $${bytes} $${start} $${end}"
+  description = "Custom VPC Flow Log record format fields"
+  type        = list(string)
+  default = [
+    "$${account-id}",
+    "$${region}",
+    "$${vpc-id}",
+    "$${az-id}",
+    "$${subnet-id}",
+    "$${instance-id}",
+    "$${interface-id}",
+    "$${srcaddr}",
+    "$${dstaddr}",
+    "$${srcport}",
+    "$${dstport}",
+    "$${pkt-srcaddr}",
+    "$${pkt-dstaddr}",
+    "$${action}",
+    "$${bytes}",
+    "$${start}",
+    "$${end}",
+    "$${traffic-path}",
+    "$${flow-direction}"
+  ]
 }
 
 variable "iam_role_name" {

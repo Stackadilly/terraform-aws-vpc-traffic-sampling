@@ -14,11 +14,11 @@ output "flow_log_ids" {
 }
 
 output "resolver_query_log_config_id" {
-  value       = var.enable_traffic_sampling ? aws_route53_resolver_query_log_config.dns[0].id : null
+  value       = var.enable_flow_sampling ? aws_route53_resolver_query_log_config.dns[0].id : null
   description = "Resolver query logging configuration id (null when logging is disabled)"
 }
 
 output "resolver_query_log_config_association_ids" {
-  value       = var.enable_traffic_sampling ? { for k, v in aws_route53_resolver_query_log_config_association.dns_assoc : k => v.id } : {}
+  value       = var.enable_flow_sampling ? { for k, v in aws_route53_resolver_query_log_config_association.dns_assoc : k => v.id } : {}
   description = "Map of VPC IDs to their corresponding Resolver query log config association IDs (empty when logging is disabled)"
 }
