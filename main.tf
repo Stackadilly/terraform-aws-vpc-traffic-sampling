@@ -91,6 +91,26 @@ resource "aws_s3_bucket_policy" "logs" {
         Action : ["s3:PutObject", "s3:AbortMultipartUpload"],
         Resource : local.log_prefix_arn
       }
+      ,
+      {
+        Sid : "AllowStackadillyRoleListBucket",
+        Effect : "Allow",
+        Principal : { AWS : var.cross_account_role_arn },
+        Action : ["s3:ListBucket"],
+        Resource : aws_s3_bucket.logs.arn,
+        Condition : {
+          StringLike : {
+            "s3:prefix" : "AWSLogs/*"
+          }
+        }
+      },
+      {
+        Sid : "AllowStackadillyRoleReadObjects",
+        Effect : "Allow",
+        Principal : { AWS : var.cross_account_role_arn },
+        Action : ["s3:GetObject", "s3:GetObjectVersion"],
+        Resource : local.log_prefix_arn
+      }
     ]
   })
 }

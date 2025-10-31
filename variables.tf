@@ -13,6 +13,11 @@ variable "vpc_ids" {
   type        = list(string)
 }
 
+variable "cross_account_role_arn" {
+  description = "ARN of the IAM role in Stackadilly's account that will access the bucket for Athena queries. To be provided by Stackadilly."
+  type        = string
+}
+
 variable "s3_retention_days" {
   description = "Retention on the logs bucket"
   type        = number
@@ -46,7 +51,7 @@ variable "flow_log_format" {
 }
 
 variable "iam_role_name" {
-  description = "Existing IAM role to which we attach an S3 read policy (scoped to this bucket/prefixes) for cross-account Athena"
+  description = "Existing IAM role to which we attach an S3 read policy (scoped to this bucket/prefixes)"
   type        = string
   default     = "Stackadilly"
 }
